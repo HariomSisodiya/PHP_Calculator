@@ -10,13 +10,13 @@
             margin: auto;
             padding: 20px;
             border: 1px solid #ccc;
-            background-color:  rgba(222, 215, 201, 0.299);
+            background-color: rgba(222, 215, 201, 0.299);
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .calculator {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, 2fr);
             gap: 10px;
         }
         .calculator input[type="text"] {
@@ -24,12 +24,13 @@
             padding: 10px;
             font-size: 18px;
         }
-        .calculator span, .calculator .equal {
+        .calculator button {
             padding: 20px;
             text-align: center;
             background-color: #ddd;
             cursor: pointer;
             font-size: 18px;
+            border: none;
         }
         .calculator .num_clear {
             background-color: rgb(247, 196, 101);
@@ -37,64 +38,62 @@
         .calculator .equal {
             background-color: rgb(94, 229, 94);
         }
+        .calculator .back:hover 
+        
+        {
+            background-color: rgb(247, 196, 101);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Calculator</h1>
-        <form class="calculator" method = "post">
-            <input type="text" class="calcu" name="inputValue" <?php echo isset($_POST['inputValue'])? $_POST['inputValue'] : ''; ?> readonly/>
-            <span class="num_clear" onclick="clearInput()">clear</span><br/>
-            <span onclick="getValue('/')">/</span>
-            <span onclick="getValue('%')">%</span>
-            <span onclick="getValue('7')">7</span>
-            <span onclick="getValue('8')">8</span>
-            <span onclick="getValue('9')">9</span>
-            <span onclick="getValue('*')">*</span>
-            <span onclick="getValue('4')">4</span>
-            <span onclick="getValue('5')">5</span>
-            <span onclick="getValue('6')">6</span>
-            <span onclick="getValue('-')">-</span>
-            <span onclick="getValue('1')">1</span>
-            <span onclick="getValue('2')">2</span>
-            <span onclick="getValue('3')">3</span>
-            <span onclick="getValue('+')">+</span>
-            <span onclick="getValue('0')">0</span>
-            <span onclick="getValue('00')">00</span>
-            <span onclick="getValue('.')">.</span>
-            <span class="equal" onclick="calculateValue()">=</span>
+        <form class="calculator" method="post">
+            <input type="text" class="calcu" name="inputValue" value="<?php echo isset($_POST['inputValue']) ? $_POST['inputValue'] : ''; ?>" readonly />
+            <button type="submit" name="action" value="clear" class="num_clear">clear</button>
+            <button type="submit" name="action" value="back" class="back">back</button>
+            <button type="submit" name="action" value="/" >/</button>
+            <button type="submit" name="action" value="%" >%</button>
+            <button type="submit" name="action" value="7">7</button>
+            <button type="submit" name="action" value="8">8</button>
+            <button type="submit" name="action" value="9">9</button>
+            <button type="submit" name="action" value="*">*</button>
+            <button type="submit" name="action" value="4">4</button>
+            <button type="submit" name="action" value="5">5</button>
+            <button type="submit" name="action" value="6">6</button>
+            <button type="submit" name="action" value="-">-</button>
+            <button type="submit" name="action" value="1">1</button>
+            <button type="submit" name="action" value="2">2</button>
+            <button type="submit" name="action" value="3">3</button>
+            <button type="submit" name="action" value="+">+</button>
+            <button type="submit" name="action" value="0">0</button>
+            <button type="submit" name="action" value="00">00</button>
+            <button type="submit" name="action" value=".">.</button>
+            <button type="submit" name="action" value="=" class="equal">=</button>
         </form>
     </div>
 
-    <script>
-        function getValue(Value){
-            let inputField = document.querySelector('.calcu');
-            inputField.value += Value;
-        }
-
-        function clearInput(){
-            let inputField = document.querySelector('.calcu');
-            inputField.value = '';
-        }
-
-        function calculateValue(){
-            document.querySelector('.calculator').submit();
-        }
-    </script>
-
     <?php
-        if($_SERVER['REQUEST_METHOD'] == "POST"){
-
+        if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $inputValue = $_POST['inputValue'];
+            $action = $_POST['action'];
 
-            try{
-
-                $result = eval("return $inputValue;");
-                echo "<script>document.querySelector('.calcu').value = '$result';</script>";
-
-            } catch(Exception $e){
-                echo "<script>alert('Invalid Exception')</script>";
+            if ($action == "clear") {
+                $inputValue = '';
+            } elseif ($action == "back") {
+                $inputValue = substr($inputValue, 0, -1);
+            } elseif ($action == "=") {
+                try {
+                    $result = eval("return $inputValue;");
+                    $inputValue = $result;
+                } catch (Exception $e) {
+                    echo "<script>alert('Invalid Expression')</script>";
+                }
+            } else {
+                $inputValue .= $action;
             }
+
+            echo "<script>document.querySelector('.calcu').value = '$inputValue';</script>";
         }
     ?>
 </body>
